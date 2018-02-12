@@ -11,5 +11,88 @@
 
     <artifactId>ricky_service</artifactId>
 
+    <properties>
+        <!-- 数据库配置 -->
+        <mybatisGeneratorDbConfigFile>maven_build/jdbc.properties</mybatisGeneratorDbConfigFile>
+        <!-- java代码目录 -->
+        <mybatisGeneratorJavaFileDir>${basedir}/src/main/java</mybatisGeneratorJavaFileDir>
+        <!-- 资源文件目录 -->
+        <mybatisGeneratorResourcesFileDir>${basedir}/src/main/resources</mybatisGeneratorResourcesFileDir>
+        <!-- 实体生成配置文件 -->
+        <mybatisGeneratorConfigFile>
+            ${basedir}/src/main/resources/maven_build/mybatis-generator-entity.xml
+        </mybatisGeneratorConfigFile>
+        <!-- 包名 -->
+        <mybatisGeneratorPackagePath>com.ricky</mybatisGeneratorPackagePath>
+
+        <!-- 国际化JS资源目标目录 -->
+        <i18nJavaScriptTargetDir>
+            ../api/src/main/webapp/assets/js/application/i18n
+        </i18nJavaScriptTargetDir>
+
+    </properties>
+    <dependencies>
+
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+
+    </dependencies>
+
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>maven_build/**/*</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        <plugins>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <!--逆向生成实体插件-->
+            <plugin>
+                <groupId>org.mybatis.generator</groupId>
+                <artifactId>mybatis-generator-maven-plugin</artifactId>
+                <version>1.3.2</version>
+                <configuration>
+                    <!-- 罗列明细 -->
+                    <verbose>true</verbose>
+                    <!-- 覆盖已有文件 -->
+                    <overwrite>true</overwrite>
+                    <!--配置文件地址 默认是resource下的generatorConfig.xml 可以自己修改像这样-->
+                    <configurationFile>${mybatisGeneratorConfigFile}</configurationFile>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>5.1.38</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+           <!-- <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>-->
+
+
+        </plugins>
+    </build>
 
 </project>

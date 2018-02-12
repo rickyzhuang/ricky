@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+
+
+
+    <!--指定特定数据库的jdbc驱动jar包的位置 可以不要-->
+<!--    <classPathEntry location="${jdbc.driverLocation}"/>-->
+
+
+    <!--导入属性配置 可以直接写也可以用maven参数-->
+    <!--<properties resource="jdbc.properties"></properties>-->
+    <properties resource="${mybatisGeneratorDbConfigFile}"/>
+
+    <context id="admin.sys" targetRuntime="MyBatis3">
+
+        <!-- 国际化JS资源目标目录 -->
+        <property name="i18nJavaScriptTargetDir" value="${i18nJavaScriptTargetDir}"/>
+        <!-- -->
+        <plugin type="org.mybatis.generator.plugins.CaseInsensitiveLikePlugin"/>
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+        <plugin type="org.mybatis.generator.plugins.RenameExampleClassPlugin">
+            <property name="searchString" value="Example"/>
+            <property name="replaceString" value="Condition"/>
+        </plugin>
+
+        <!-- optional，旨在创建class时，对注释进行控制 -->
+        <commentGenerator>
+            <property name="suppressDate" value="true"/>
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+        <!-- 配置连接数据信息 -->
+        <jdbcConnection driverClass="${mvn.jdbc.driver}" connectionURL="${mvn.jdbc.url}" userId="${mvn.jdbc.username}" password="${mvn.jdbc.password}"/>
+        <!-- 配置自动生成的Model的保存路径与其它参数 -->
+
+        <!-- 非必需，类型处理器，在数据库类型和java类型之间的转换控制-->
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+        <!-- Model模型生成器,用来生成含有主键key的类，记录类 以及查询Example类
+            targetPackage     指定生成的model生成所在的包名
+            targetProject     指定在该项目下所在的路径
+        -->
+        <javaModelGenerator targetPackage="${mybatisGeneratorPackagePath}" targetProject="${mybatisGeneratorJavaFileDir}">
+            <!-- 给Model添加一个父类 -->
+          <!--  <property name="rootClass" value="com.ricky.base.entity.BaseEntity"/>-->
+            <property name="javaFileEncoding" value="UTF-8"/>
+            <!-- 是否对model添加 构造函数 -->
+            <property name="constructorBased" value="true"/>
+
+            <!-- 是否允许子包，即targetPackage.schemaName.tableName -->
+            <property name="enableSubPackages" value="false"/>
+
+            <!-- 建立的Model对象是否 不可改变  即生成的Model对象不会有 setter方法，只有构造方法 -->
+            <property name="immutable" value="true"/>
+
+            <!-- 是否对类CHAR类型的列的数据进行trim操作 -->
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <!--Mapper映射文件生成所在的目录 为每一个数据库的表生成对应的SqlMap文件 -->
+        <sqlMapGenerator targetPackage="${mybatisGeneratorPackagePath}" targetProject="${mybatisGeneratorResourcesFileDir}"/>
+        <!-- 配置自动生成的Mappper.java接口的保存路径与其它参数 -->
+       <!-- <javaClientGenerator type="XMLMAPPER" targetPackage="${mybatisGeneratorPackagePath}" targetProject="${mybatisGeneratorJavaFileDir}">
+            <property name="rootInterface" value="com.peppa.framework.mybatis.mapper.BaseMapper"/>
+        </javaClientGenerator>-->
+        <!-- 配置自动生成的Mappper.java接口的保存路径与其它参数 -->
+        <javaClientGenerator targetPackage="com.ricky"
+                             targetProject="${mybatisGeneratorJavaFileDir}" type="XMLMAPPER">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+        <table tableName="user" domainObjectName="user.entity.UserEntity"/>
+        <table tableName="game" domainObjectName="game.entity.GameEntity"/>
+    	
+    </context>
+</generatorConfiguration>
