@@ -1,5 +1,6 @@
 package com.ricky.index.controller;
 
+import com.ricky.base.BaseController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,11 +15,12 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Controller
 @RequestMapping("/ricky/index")
-public class IndexController {
+public class IndexController extends BaseController{
 
     @RequestMapping("/index.htm")
     public  String index(Model model, HttpServletRequest request, HttpServletResponse response){
-        model.addAttribute("userName","ricky");
+        logger.info("index.htm 进入首页！");
+        model.addAttribute("userName","庄先生");
         model.addAttribute("say","hello world");
         return  "/index/index";
     }

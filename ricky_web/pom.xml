@@ -18,6 +18,13 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
+        <!--日志 这个就够了 可以查看其包含了所有我们需要的logback的jar包了-->
+        <dependency>
+            <groupId>org.logback-extensions</groupId>
+            <artifactId>logback-ext-spring</artifactId>
+            <version>0.1.2</version>
+        </dependency>
+
         <!--servlet相关-->
         <dependency>
             <groupId>javax.servlet</groupId>
