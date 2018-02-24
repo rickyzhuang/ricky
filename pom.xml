@@ -13,6 +13,7 @@
         <module>ricky_service</module>
         <module>ricky_web</module>
         <module>ricky_admin_web</module>
+        <module>ricky_springBoot_web</module>
     </modules>
 
 

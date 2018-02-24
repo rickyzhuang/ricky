@@ -14,4 +14,7 @@
 hello this is  from ricky web  index 我是中文
 
 ${userName} ${say}
+
+
+result ${result}
 </body>

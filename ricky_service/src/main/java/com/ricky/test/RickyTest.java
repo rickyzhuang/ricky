@@ -24,7 +24,8 @@ public class RickyTest   {
           Logger logger = LoggerFactory
                 .getLogger(RickyTest.class);
         //加载配置文件
-        String resource = "maven_build/mybatis-config.xml";
+//        String resource = "maven_build/mybatis-config.xml";
+        String resource = "META-INF/spring/mybatis-config.xml";
         InputStream inputStream = Resources.getResourceAsStream(resource);
         // 获取sqlSession
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
