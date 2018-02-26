@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+
+<!--    <context:component-scan base-package="com.ricky"/>-->
+
+    <!-- Data Source -->
+
+    <bean id="dataSource"
+          class="com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource">
+        <property name="user" value="root"/>
+        <property name="password" value="123456"/>
+        <property name="url" value="jdbc:mysql://my.centos.com:3306/peppa"/>
+        <!--<property name="url" value="${mvn.jdbc.url}"/>-->
+        <property name="useSSL" value="false"/>
+
+    </bean>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="typeAliasesPackage" value="com.ricky.user.entity"></property>
+        <property name="mapperLocations" value="classpath*:com/ricky/user/entity/*.xml"></property>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.ricky.user.entity"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+    <mybatis:scan base-package="com.ricky.user.entity"/>
+</beans>

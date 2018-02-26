@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+
+    <context:component-scan base-package="com.ricky"/>
+
+    <!-- Data Source -->
+
+    <!--数据源-->
+    <bean id="dataSource"
+          class="com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource">
+        <property name="user" value="root"/>
+        <property name="password" value="123456"/>
+        <property name="url" value="jdbc:mysql://my.centos.com:3306/peppa"/>
+        <property name="useSSL" value="false"/>
+
+    </bean>
+    <!--<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/fqz"/>
+        <property name="user" value="root"/>
+        <property name="password" value="abcd1234"/>
+        &lt;!&ndash; 当连接池中的连接耗尽的时候c3p0一次同时获取的连接数  &ndash;&gt;
+        <property name="acquireIncrement" value="5"></property>
+        &lt;!&ndash; 初始连接池大小 &ndash;&gt;
+        <property name="initialPoolSize" value="10"></property>
+        &lt;!&ndash; 连接池中连接最小个数 &ndash;&gt;
+        <property name="minPoolSize" value="5"></property>
+        &lt;!&ndash; 连接池中连接最大个数 &ndash;&gt;
+        <property name="maxPoolSize" value="20"></property>
+    </bean>-->
+
+    <!-- 扫描对应的XML Mapper -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 数据源 -->
+        <property name="dataSource" ref="dataSource"></property>
+        <!-- 别名,它一般对应我们的实体类所在的包，这个时候会自动取对应包中不包括包名的简单类名作为包括包名的别名。多个package之间可以用逗号或者分号等来进行分隔。 -->
+        <property name="typeAliasesPackage" value="com.fqz.mybatis.entity"></property>
+        <!-- sql映射文件路径,它表示我们的Mapper文件存放的位置，当我们的Mapper文件跟对应的Mapper接口处于同一位置的时候可以不用指定该属性的值。 -->
+        <property name="mapperLocations" value="classpath*:com/ricky/user/entity/*.xml"></property>
+    </bean>
+
+    <!-- 扫描对应的Java Mapper -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.fqz.mybatis.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+    <mybatis:scan base-package="com.ricky.user.entity."/>
+</beans>

@@ -25,4 +25,6 @@
         <mapper resource="com/ricky/user/entity/UserEntityMapper.xml"/>
     </mappers>
 
+
+
 </configuration>

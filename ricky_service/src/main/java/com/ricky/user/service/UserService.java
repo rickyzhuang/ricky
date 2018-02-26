@@ -26,9 +26,9 @@ public class UserService extends BaseService implements  IUserService {
 
     public UserVO getUserVOBYId(String id) throws BusinessException {
         UserVO userVO=new UserVO();
-//        UserEntity userEntity=   userEntityMapper.selectByPrimaryKey(id);
-//        BeanUtils.copyProperties(userEntity,userVO);
-        userVO.setName("李大仁");
+        UserEntity userEntity=   userEntityMapper.selectByPrimaryKey(id);
+        BeanUtils.copyProperties(userEntity,userVO);
+//        userVO.setName("李大仁");
         logger.info("UserName是{}",userVO.getName());
         return  userVO;
     }
