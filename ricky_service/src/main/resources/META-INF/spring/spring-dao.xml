@@ -13,12 +13,14 @@
 
     <!-- Data Source -->
 
+    <context:property-placeholder location="classpath:maven_build/jdbc.properties"/><!-- bean config param -->
+
     <bean id="dataSource"
           class="com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource">
-        <property name="user" value="root"/>
-        <property name="password" value="123456"/>
-        <property name="url" value="jdbc:mysql://my.centos.com:3306/peppa"/>
-        <!--<property name="url" value="${mvn.jdbc.url}"/>-->
+        <property name="user" value="${mvn.jdbc.username}"/>
+        <property name="password" value="${mvn.jdbc.password}"/>
+        <!--<property name="url" value="jdbc:mysql://my.centos.com:3306/peppa"/>-->
+        <property name="url" value="${mvn.jdbc.url}"/>
         <property name="useSSL" value="false"/>
 
     </bean>
