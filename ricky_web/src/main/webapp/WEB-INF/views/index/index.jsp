@@ -17,4 +17,7 @@ ${userName} ${say}
 
 
 result ${result}
+gameName ${gameName}
+
+
 </body>

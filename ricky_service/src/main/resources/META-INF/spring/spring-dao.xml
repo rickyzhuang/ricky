@@ -27,14 +27,14 @@
 
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"></property>
-        <property name="typeAliasesPackage" value="com.ricky.user.entity"></property>
-        <property name="mapperLocations" value="classpath*:com/ricky/user/entity/*.xml"></property>
+        <property name="typeAliasesPackage" value="com.ricky.*.entity"></property>
+        <property name="mapperLocations" value="classpath*:com/ricky/*/*/*Mapper.xml"></property>
     </bean>
 
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.ricky.user.entity"/>
+        <property name="basePackage" value="com.ricky.*.entity"/>
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
     </bean>
 
-    <mybatis:scan base-package="com.ricky.user.entity"/>
+    <mybatis:scan base-package="com.ricky.*.entity"/>
 </beans>

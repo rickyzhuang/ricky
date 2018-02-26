@@ -20,9 +20,11 @@
 
     <!-- service implementation, as same as regular local bean -->
     <bean id="userService" class="com.ricky.user.service.UserService"/>
+    <bean id="gameService" class="com.ricky.game.service.GameService"/>
 <!--    <dubbo:annotation package="com.ricky"/>-->
     <!-- declare the service interface to be exported -->
     <dubbo:service interface="com.ricky.user.service.IUserService" ref="userService"/>
+    <dubbo:service interface="com.ricky.game.service.IGameService" ref="gameService"/>
 
 
 

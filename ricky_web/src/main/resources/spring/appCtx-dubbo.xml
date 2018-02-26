@@ -23,6 +23,7 @@
 	<!-- generate proxy for the remote service, then demoService can be used in the same way as the
     local regular interface -->
 	<dubbo:reference id="userService" check="false" interface="com.ricky.user.service.IUserService"/>
+	<dubbo:reference id="gameService" check="false" interface="com.ricky.game.service.IGameService"/>
 
 	<!--<dubbo:reference id="userService" url="dubbo://127.0.0.1:20880" interface="com.ricky.user.service.IUserService" check="true"/>-->
 
