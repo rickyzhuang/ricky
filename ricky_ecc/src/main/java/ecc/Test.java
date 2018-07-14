@@ -14,7 +14,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class Test extends TestCase {
 
-    public static String CHARSET_UTF8="UTF8";
+    public static String CHARSET_UTF8="UNICODE";
     public static String CHARSET_UNICODE="UNICODE";
     public static int G_RANK=3;
     public static int F_Q=127;
@@ -36,13 +36,14 @@ public class Test extends TestCase {
         int gRank=3;
         Point g=new Point(3,44);
         String msg="我是庄钾寅zhuangjiayin!@#123!！|~";
+//        String msg="-1-1-1-1-1";
         Point secret= EccUtil.enCode(msg.getBytes(CHARSET_UTF8),gRank, fq, a, g);
         String secretMsg=new String(secret.getBytes(),CHARSET_UTF8);
         System.out.println("明文："+msg);
         System.out.println("密文："+secretMsg);
         byte[] openBytes= EccUtil.deCode(secret,fq, a, g);
         String openStr=new String(openBytes,CHARSET_UTF8);
-        System.out.println("解密后文字:"+openStr);
+        System.out.println("解密后文字："+openStr);
     }
 
     public void testImg()throws  Exception{
@@ -82,14 +83,19 @@ public class Test extends TestCase {
         fin.close();
     }
 
-    public  void testAain() throws Exception {
+    public  void testImgFun() throws Exception {
         //先模拟一个图形byte[]
         byte[] open =image2Bytes("c:/peppa.jpg");
         //存为文件 -1  6 0
-        Point imgSecret= EccUtil.enCode(open,G_RANK, F_Q, A, G);
+        Point imgSecret= EccUtil.enCode(open,G_RANK, 129, A, G);
         buff2Image(imgSecret.getBytes(),"c:/secret.jpg");
-        byte[] openBytes=EccUtil.deCode(imgSecret,F_Q,A,G);
+        byte[] openBytes=EccUtil.deCode(imgSecret,129,A,G);
         buff2Image(openBytes,"c:/open.jpg");
+        for (int i = 0; i <open.length ; i++) {
+            if (open[i]!=openBytes[i]) {
+                System.out.println("====================================i="+i+","+open[i]+","+openBytes[i]);
+            }
+        }
         System.out.println("Hello World!");
     }
 
@@ -114,6 +120,30 @@ public class Test extends TestCase {
         //将字节写入文件
         fout.write(b);
         fout.close();
+    }
+
+    public  void testMod(){
+        int a=117%129;
+        int b=3000;
+        System.out.println( a);
+        System.out.println((byte) b);
+    }
+    public void testAllBytes(){
+        byte[] allBytes=new byte[256];
+        int index=0;
+        for (byte i = -128; index<256 ; i++,index++) {
+            allBytes[index]=i;
+//            System.out.println(index+"==="+i);
+        }
+//        System.out.println("加密前:"+new String(allBytes));
+        Point enPoint= EccUtil.enCode(allBytes, G_RANK, 129, A, G);
+//        System.out.println("加密后："+new String(enPoint.getBytes()));
+        byte[] after=EccUtil.deCode(enPoint,129,A,G);
+//        System.out.println("解密后："+new String(after));
+        for (int i = 0; i <after.length ; i++) {
+            System.out.println("after"+i+":"+after[i]);
+        }
+
     }
 
 

@@ -189,16 +189,23 @@ public  static  String  CHARSET_UTF8="UTF8";
 
                 Random r1 = new Random();
 //            rand.nextInt(MAX - MIN + 1) + MIN
-            k=(r1.nextInt(gRank-1-1+1)+1) %gRank;
+//            k=(r1.nextInt(gRank-1-1+1)+1) %gRank;
+            k=PRIVATE_KEY;
+            System.out.println("k=:"+k);
             p1=EccUtil.kMulPoint(g,k,a);                 //   计算p1=kg(x1,y1)      第一点P点    //
 
             p2=EccUtil.kMulPoint(q,k,a);                 // 计算p2=kq=(x2,y2)  第二个点//
             if (p2.x!=0) break;
         }
 //        mw.c=(char)(m1*p2.x)%fq ;            // 加密c=字符与x2作乘//
+
+
+        System.out.println("encode K:"+k);
+        System.out.println("encode p2.x:"+p2.x);
         for (int i = 0; i <openWord.length ; i++) {
 //            System.out.println("en"+i+":"+openWord[i]);
-            secretBytes[i]=(byte) (openWord[i]*p2.x%fq);
+            secretBytes[i]=(byte) (openWord[i]*p2.x%fq);  // 强转之后的值 也必须落在byte范围内
+//            secretBytes[i]=int2byte(openWord[i]*p2.x);  // 强转之后的值 也必须落在byte范围内
         }
         secretWord.x=p1.x;
         secretWord.y=p1.y;
@@ -207,6 +214,13 @@ public  static  String  CHARSET_UTF8="UTF8";
         return secretWord;
     }
 
+    public static byte int2byte(int x){
+        if (x >=0) {
+            return (byte) (x%(Byte.MAX_VALUE+1));
+        }else{
+            return (byte) (x%(Byte.MIN_VALUE));
+        }
+    }
 
     /**
      * 解密方法
@@ -226,6 +240,7 @@ public  static  String  CHARSET_UTF8="UTF8";
         p1.x=secretWord.x;
         p1.y=secretWord.y;
         p2=EccUtil.kMulPoint (p1,PRIVATE_KEY,a);          //    计算dp=(x2,y2)     //
+        System.out.println("decode p2.x:"+p2.x);
 
    /*     m=(mw1.c/p2.x)%fq ;           //      恢复m=c乘x逆 c除以x2             //
         if ((mw1.c%p2.x)!=0) {
@@ -236,9 +251,9 @@ public  static  String  CHARSET_UTF8="UTF8";
         for (int j = 0; j <secretBytes.length ; j++) {
 
 //            openBytes[j]=(byte) (secretBytes[j]/p2.x%fq); //      恢复m=c乘x逆 c除以x2             //
-            if (secretBytes[j]%p2.x!=0) {   //表示不是原值
-                for (int k = -fq-1; k <=fq ; k++) {
-                    if (secretBytes[j]==p2.x*k%fq) {
+            if (true||secretBytes[j]%p2.x!=0) {   //表示不是原值
+                for (int k =-128; k <=127 ; k++) {
+                    if (secretBytes[j]!=0&&secretBytes[j]==p2.x*k%fq) {
                         openBytes[j]=(byte) k;
 //                        System.out.println("de"+j+":"+k);
                         continue;
