@@ -146,5 +146,18 @@ public class Test extends TestCase {
 
     }
 
+    public void testByte119(){
+        byte[] allBytes=new byte[1];
+        allBytes[0]=119;
+        Point enPoint= EccUtil.enCode(allBytes, G_RANK, 129, A, G);
+//        System.out.println("加密后："+new String(enPoint.getBytes()));
+        byte[] after=EccUtil.deCode(enPoint,129,A,G);
+//        System.out.println("解密后："+new String(after));
+        for (int i = 0; i <after.length ; i++) {
+            System.out.println("after"+i+":"+after[i]);
+        }
+
+    }
+
 
 }

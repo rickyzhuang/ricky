@@ -204,8 +204,8 @@ public  static  String  CHARSET_UTF8="UTF8";
         System.out.println("encode p2.x:"+p2.x);
         for (int i = 0; i <openWord.length ; i++) {
 //            System.out.println("en"+i+":"+openWord[i]);
-            secretBytes[i]=(byte) (openWord[i]*p2.x%fq);  // 强转之后的值 也必须落在byte范围内
-//            secretBytes[i]=int2byte(openWord[i]*p2.x);  // 强转之后的值 也必须落在byte范围内
+//            secretBytes[i]=(byte) (openWord[i]*p2.x%fq);  // 强转之后的值 也必须落在byte范围内
+            secretBytes[i]=int2byte(openWord[i]*p2.x);  // 强转之后的值 也必须落在byte范围内
         }
         secretWord.x=p1.x;
         secretWord.y=p1.y;
@@ -216,9 +216,9 @@ public  static  String  CHARSET_UTF8="UTF8";
 
     public static byte int2byte(int x){
         if (x >=0) {
-            return (byte) (x%(Byte.MAX_VALUE+1));
+            return (byte) (x%(128));
         }else{
-            return (byte) (x%(Byte.MIN_VALUE));
+            return (byte) (x%(-129));
         }
     }
 
