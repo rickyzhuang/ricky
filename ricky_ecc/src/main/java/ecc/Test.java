@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 /**
  * Describetion
@@ -18,7 +19,7 @@ public class Test extends TestCase {
     public static String CHARSET_UNICODE="UNICODE";
     public static int G_RANK=3;
     public static int F_Q=127;
-    public static int A=3;
+    public static int A=4;
     public static Point G=  new Point(3,44);
 
      public static  void  main(String[] agrs) throws UnsupportedEncodingException {
@@ -35,7 +36,7 @@ public class Test extends TestCase {
         int fq=127;
         int gRank=3;
         Point g=new Point(3,44);
-        String msg="我是庄钾寅zhuangjiayin!@#123!！|~";
+        String msg="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+~{}|:<>?~！@#￥%……&*（）——+：《》？";
 //        String msg="-1-1-1-1-1";
         Point secret= EccUtil.enCode(msg.getBytes(CHARSET_UTF8),gRank, fq, a, g);
         String secretMsg=new String(secret.getBytes(),CHARSET_UTF8);
@@ -43,7 +44,7 @@ public class Test extends TestCase {
         System.out.println("密文："+secretMsg);
         byte[] openBytes= EccUtil.deCode(secret,fq, a, g);
         String openStr=new String(openBytes,CHARSET_UTF8);
-        System.out.println("解密后文字："+openStr);
+        System.out.println("解密："+openStr);
     }
 
     public void testImg()throws  Exception{
@@ -122,11 +123,16 @@ public class Test extends TestCase {
         fout.close();
     }
 
+    /**
+     * Java中取余运算具有如下性质：对所有int数值a和所有非零int数值b满足：
+     　　(a / b ) * b + (a % b) == a;
+     　　这意味着当取余操作返回一个非零的结果时。它与左操作数具有相同的正负符号
+     */
     public  void testMod(){
-        int a=117%129;
-        int b=3000;
+        int a=44*44%127;
+        int b=(3*3*3+4*3+20)%127;
         System.out.println( a);
-        System.out.println((byte) b);
+        System.out.println( b);
     }
     public void testAllBytes(){
         byte[] allBytes=new byte[256];
@@ -159,5 +165,10 @@ public class Test extends TestCase {
 
     }
 
+    public void  testEccParamTest(){
+        List<Point> allList= EccUtil.getAllPoint(A,20,F_Q );
+        List<Point> basePointList= EccUtil.getBasePointList(A,20,F_Q );
+        System.out.println(basePointList);
+    }
 
 }

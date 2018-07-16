@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -75,23 +77,28 @@ public  static  String  CHARSET_UTF8="UTF8";
 
 
     /**
-     * 获取椭圆曲线的阶
+     * 求域上所有的点
+     * y 2= x 3+ 4x + 20    (fq=127)
      * 只是求fq域里有多少个点在上面
      * @param a
      * @param b
      * @param fq
      * @return
      */
-    public  static  int  getKeyNum(int a,int b,int fq){
-            int n=1;
-        for (int i = 0; i <fq ; i++) {
-            for (int j = 0; j <fq ; j++) {
-                if (i*i-j*j*j+a*j+b==0) {
-                    n=n+1;
+    public  static List<Point> getAllPoint(int a, int b, int fq){
+        Point point;
+        List<Point> list=new ArrayList<Point>();
+        for (int i = -fq; i <=fq ; i++) {
+            for (int j = -fq; j <=fq ; j++) {
+                if (i*i==j*j*j+a*j+b) {//点在曲线上
+                    point=new Point();
+                    point.y=i;
+                    point.x=j;
+                    list.add(point);
                 }
             }
         }
-        return n;
+        return list;
     }
 
     /**
@@ -106,7 +113,8 @@ public  static  String  CHARSET_UTF8="UTF8";
     public static   Point  pointAdd(Point p1,Point p2,int a){
         Point p3=new Point();
         int r;
-        if (p1.x==p2.x&&p1.y==p2.y){
+//        if (p1.x==p2.x&&p1.y==p2.y){
+        if (p1.x==p2.x){
             r=3*(p1.x*p1.x+a)/(2*p1.y);
         }else{
             r=1*(p2.y-p1.y)/(p2.x-p1.x);
@@ -146,28 +154,32 @@ public  static  String  CHARSET_UTF8="UTF8";
     }
 
     /**
-     * 求基点的阶  可以先不管  这个基点阶为3
-     * @param g
+     *  *y 2= x 3+ 4x + 20    (fq=127)
+     * 根据椭圆特征求基点
+     * 要求 1、该点要在曲线上，2  该点经过n次点乘后 得到单元o。3，这个n必须得是素数
      * @param a
      * @param b
      * @param fq
      * @return
      */
-    public  static  int getBaseKey(Point g,int a,int b,int fq){
-        int n1=5;
-        Point cache=new Point();
-        if( g.y*g.y==g.x*g.x*g.x+a*g.x+b){
-          /*  Random r1 = new Random();
-
-　　　　  int k= r1.nextInt(10);*/
-            cache=EccUtil.kMulPoint( g, n1,a);
+    public  static  List<Point> getBasePointList(int a,int b,int fq){
+      List<Point> allPoint=EccUtil.getAllPoint(a,b,fq);
+      List<Point> basePoint=new ArrayList<Point>();
+        if (allPoint == null) {
+            return null;
         }
-
-        if ( g.x==cache.x%fq&&EccUtil.isPrimeNum(n1)){
-            return  n1;
+        Point nextPoint;
+        for (Point point: allPoint) {
+            for (int i = 2; i <=fq ; i++) {
+                nextPoint=EccUtil.kMulPoint(point,i,a);
+                if (nextPoint.x==point.x&&isPrimeNum(i)) {
+                    point.n=i;
+                    basePoint.add(point);
+                    continue;
+                }
+            }
         }
-        return n1;
-
+        return basePoint;
     }
 
     /**
@@ -197,15 +209,12 @@ public  static  String  CHARSET_UTF8="UTF8";
             p2=EccUtil.kMulPoint(q,k,a);                 // 计算p2=kq=(x2,y2)  第二个点//
             if (p2.x!=0) break;
         }
-//        mw.c=(char)(m1*p2.x)%fq ;            // 加密c=字符与x2作乘//
 
 
         System.out.println("encode K:"+k);
         System.out.println("encode p2.x:"+p2.x);
         for (int i = 0; i <openWord.length ; i++) {
-//            System.out.println("en"+i+":"+openWord[i]);
-//            secretBytes[i]=(byte) (openWord[i]*p2.x%fq);  // 强转之后的值 也必须落在byte范围内
-            secretBytes[i]=int2byte(openWord[i]*p2.x);  // 强转之后的值 也必须落在byte范围内
+            secretBytes[i]=int2byte(openWord[i]*p2.x);  //  加密c=字符与x2作乘 强转之后的值 也必须落在byte范围内
         }
         secretWord.x=p1.x;
         secretWord.y=p1.y;
@@ -214,18 +223,26 @@ public  static  String  CHARSET_UTF8="UTF8";
         return secretWord;
     }
 
+    /**
+     * translate int to byte
+     * when decode  do it reversal
+     *Java中取余运算具有如下性质：对所有int数值a和所有非零int数值b满足：
+     　　(a / b ) * b + (a % b) == a;
+     　　这意味着当取余操作返回一个非零的结果时。它与左操作数具有相同的正负符号
+     * @param x
+     * @return
+     */
     public static byte int2byte(int x){
         if (x >=0) {
             return (byte) (x%(128));
         }else{
-            return (byte) (x%(-129));
+            return (byte) (x%(129));
         }
     }
 
     /**
      * 解密方法
      * @param secretWord
-     * @param n1
      * @param fq
      * @param a
      * @param g
@@ -242,24 +259,27 @@ public  static  String  CHARSET_UTF8="UTF8";
         p2=EccUtil.kMulPoint (p1,PRIVATE_KEY,a);          //    计算dp=(x2,y2)     //
         System.out.println("decode p2.x:"+p2.x);
 
-   /*     m=(mw1.c/p2.x)%fq ;           //      恢复m=c乘x逆 c除以x2             //
-        if ((mw1.c%p2.x)!=0) {
-            for (i=0;i<fq&&(mw1.c!=(p2.x*i)%fq);i++);     //         ?            //
-            m=i;
-        }*/
         byte[] secretBytes=secretWord.getBytes();
-        for (int j = 0; j <secretBytes.length ; j++) {
+        for (int j = 0; j <secretBytes.length ; j++) { // 恢复m=c乘x逆 c除以x2             //
 
-//            openBytes[j]=(byte) (secretBytes[j]/p2.x%fq); //      恢复m=c乘x逆 c除以x2             //
-            if (true||secretBytes[j]%p2.x!=0) {   //表示不是原值
-                for (int k =-128; k <=127 ; k++) {
-                    if (secretBytes[j]!=0&&secretBytes[j]==p2.x*k%fq) {
+            byte  temp=secretBytes[j];
+
+            if (temp>=0) {
+                for (int k = 0; k <=127 ; k++) {
+                    if (temp==p2.x*k%128) {
                         openBytes[j]=(byte) k;
-//                        System.out.println("de"+j+":"+k);
+                        continue;
+                    }
+                }
+            }else {
+                for (int k = -128; k <0 ; k++) {
+                    if (temp==p2.x*k%129) {
+                        openBytes[j]=(byte) k;
                         continue;
                     }
                 }
             }
+            
         }
 
         return openBytes;
@@ -312,33 +332,7 @@ public  static  String  CHARSET_UTF8="UTF8";
     }
 
 
-/*
-    public static  void  main (String[] args) throws Exception {
-        int a=4;
-        int fq=127;
-        int gRank=3;
-        Point g=new Point(3,44);
-        byte[]  imgBytes=new byte[4615];
-        File file=new File("c:/peppaSecret.jpg");
-        File secretFile=new File("c:/peppaOpen.jpg");
-        FileInputStream inputStream=new FileInputStream(file);
-        FileOutputStream outputStream=new FileOutputStream(secretFile);
 
-
-        int i=0;
-        int index=0;
-        while((i=inputStream.read())!=-1){//把读取的数据放到i中
-            imgBytes[index]=(byte) i;
-            index++;
-        }
-        Point imgSecret= EccUtil.enCode(imgBytes,gRank, fq, a, g);
-        byte[] openBytes= EccUtil.deCode(imgSecret,fq, a, g);
-        inputStream.close();
-        outputStream.write(openBytes);
-        outputStream.close();
-        //把
-    }
-*/
 
 
 }

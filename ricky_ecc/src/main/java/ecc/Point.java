@@ -9,6 +9,10 @@ public class Point {
     int x;
     int y;
     byte[] bytes;
+    /**
+     * 基点的阶
+     */
+    int n;
 
     public int getX() {
         return x;
@@ -40,5 +44,13 @@ public class Point {
 
     public void setBytes(byte[] bytes) {
         this.bytes = bytes;
+    }
+
+    public int getN() {
+        return n;
+    }
+
+    public void setN(int n) {
+        this.n = n;
     }
 }
