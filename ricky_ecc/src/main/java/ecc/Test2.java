@@ -68,7 +68,7 @@ public class Test2 extends TestCase {
         Point qPoint=EccUtil.createOpenKey(basePoint,A, receivePrivateKey);
         System.out.println("公钥q："+qPoint);
 
-        int sendPrivateKey=random.nextInt(basePointRank);
+        int sendPrivateKey=random.nextInt(basePointRank-1-1+1)+1;
 //         sendPrivateKey=2;
         System.out.println("发送方秘钥："+sendPrivateKey);
         Point secret= EccUtil.enCode(msg.getBytes(CHARSET_UTF8),sendPrivateKey,F_Q, A,basePoint,qPoint);
@@ -104,7 +104,7 @@ public class Test2 extends TestCase {
         Point qPoint=EccUtil.createOpenKey(basePoint,A, receivePrivateKey);
         System.out.println("公钥q："+qPoint);
 
-        int sendPrivateKey=random.nextInt(basePointRank);
+        int sendPrivateKey=random.nextInt(basePointRank-1-1+1)+1;
         System.out.println("发送方秘钥："+sendPrivateKey);
         Point imgSecret= EccUtil.enCode(null,sendPrivateKey,F_Q, A,basePoint,qPoint);
         outputStream.write(imgSecret.getBytes());
@@ -151,7 +151,7 @@ public class Test2 extends TestCase {
         Point qPoint=EccUtil.createOpenKey(basePoint,A, receivePrivateKey);
         System.out.println("公钥q："+qPoint);
 
-        int sendPrivateKey=random.nextInt(basePointRank);
+        int sendPrivateKey=random.nextInt(basePointRank-1-1+1)+1;
         System.out.println("发送方秘钥："+sendPrivateKey);
         Point secret= EccUtil.enCode(open,sendPrivateKey,F_Q, A,basePoint,qPoint);
 

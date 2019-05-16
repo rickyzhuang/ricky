@@ -58,7 +58,7 @@ public class ImageTest extends JPanel{
             Point qPoint=EccUtil.createOpenKey(basePoint,A, receivePrivateKey);
             System.out.println("公钥q："+qPoint);
 
-            int sendPrivateKey=random.nextInt(basePointRank);
+            int sendPrivateKey=random.nextInt(basePointRank-1-1+1)+1;
             System.out.println("发送方秘钥："+sendPrivateKey);
 
 
