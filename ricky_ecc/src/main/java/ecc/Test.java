@@ -1,18 +1,23 @@
+/*
 package ecc;
 
+import com.sun.javafx.scene.control.skin.EmbeddedTextContextMenuContent;
 import junit.framework.TestCase;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.List;
 
+*/
 /**
  * Describetion
  * Created  by  zhuangjiayin
  * Date : 2018/7/13
- */
+ *//*
+
 public class Test extends TestCase {
 
     public static String CHARSET_UTF8="UNICODE";
@@ -20,6 +25,7 @@ public class Test extends TestCase {
     public static int G_RANK=3;
     public static int F_Q=127;
     public static int A=4;
+    public static int B=20;
     public static Point G=  new Point(3,44);
 
      public static  void  main(String[] agrs) throws UnsupportedEncodingException {
@@ -31,12 +37,21 @@ public class Test extends TestCase {
          System.out.println(new String(bytes,"UTF8"));
 
      }
+
+    public void testEccParam() throws  Exception{
+        System.out.println("getAllPoint:"+ EccUtil.getAllPoint(A, B,F_Q));
+        System.out.println("getAllPoint:共有几个数"+ EccUtil.getAllPoint(A, B,F_Q).size());
+        System.out.println("getBasePointList:"+ EccUtil.getBasePointList(A, B,F_Q));
+        System.out.println("getBasePointList 共有几个数:"+ EccUtil.getBasePointList(A, B,F_Q).size());
+
+    }
     public void testEccString() throws  Exception{
         int a=4;
         int fq=127;
         int gRank=3;
         Point g=new Point(3,44);
-        String msg="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+~{}|:<>?~！@#￥%……&*（）——+：《》？";
+//        String msg="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+~{}|:<>?~！@#￥%……&*（）——+：《》？";
+        String msg="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 //        String msg="-1-1-1-1-1";
         Point secret= EccUtil.enCode(msg.getBytes(CHARSET_UTF8),gRank, fq, a, g);
         String secretMsg=new String(secret.getBytes(),CHARSET_UTF8);
@@ -123,11 +138,13 @@ public class Test extends TestCase {
         fout.close();
     }
 
-    /**
+    */
+/**
      * Java中取余运算具有如下性质：对所有int数值a和所有非零int数值b满足：
      　　(a / b ) * b + (a % b) == a;
      　　这意味着当取余操作返回一个非零的结果时。它与左操作数具有相同的正负符号
-     */
+     *//*
+
     public  void testMod(){
         int a=44*44%127;
         int b=(3*3*3+4*3+20)%127;
@@ -171,4 +188,41 @@ public class Test extends TestCase {
         System.out.println(basePointList);
     }
 
+    public void testMask(){
+        Integer  a=0x01;
+        Integer  b=0x11;
+//        Integer.toBinaryString("1111111111");
+        System.out.println("a"+Integer.toBinaryString(a));
+        System.out.println("~a"+Integer.toBinaryString(~a));
+        System.out.println("a|b"+Integer.toBinaryString(a|b));
+        System.out.println("a&b"+Integer.toBinaryString(a&b));
+        System.out.println("a^b"+Integer.toBinaryString(a^b));
+        System.out.println("5的二进制"+Integer.toBinaryString(5));
+        System.out.println("5的bitCount"+Integer.bitCount(5));
+    }
+    public void testMask1(){
+        String  totalMask  ="1111111111";
+        String  selectMask="1010101010";
+        Float  percent=0.8f;
+        String target1="1111111010";//  应该是100%命中  1  3   5 7 9
+        String target2="0111111010";// 应该是80%命中  3 5 7   9
+        System.out.println("5的bitCount"+Integer.bitCount(5));
+        System.out.println("5的bitCount"+Integer.bitCount(5));
+    }
+    public void testMask2(){
+        String  totalMask  ="1111111111";
+        String  selectMask="1010101010";
+        Float  percent=0.8f;
+        String target1="1111111010";//  应该是100%命中  1  3   5 7 9
+        String target2="0111111010";// 应该是80%命中  3 5 7   9
+        char[] selectArray=selectMask.toCharArray();
+        char[] target1Array=target1.toCharArray();
+        System.out.println("5的bitCount"+Integer.bitCount(5));
+
+        Date d=new Date();
+        d.setTime(1542072117413L);
+        System.out.println(d);
+    }
+
 }
+*/

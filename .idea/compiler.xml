@@ -8,7 +8,9 @@
         <outputRelativeToContentRoot value="true" />
         <module name="ricky_admin_web" />
         <module name="ricky_api" />
+        <module name="ricky_ecc" />
         <module name="ricky_service" />
+        <module name="ricky_springBoot_web" />
         <module name="ricky_web" />
       </profile>
     </annotationProcessing>
@@ -16,7 +18,9 @@
       <module name="ricky" target="1.5" />
       <module name="ricky_admin_web" target="1.5" />
       <module name="ricky_api" target="1.5" />
+      <module name="ricky_ecc" target="1.5" />
       <module name="ricky_service" target="1.5" />
+      <module name="ricky_springBoot_web" target="1.5" />
       <module name="ricky_web" target="1.5" />
     </bytecodeTargetLevel>
   </component>

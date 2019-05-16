@@ -1,10 +1,12 @@
 package ecc;
 
+import sun.misc.BASE64Encoder;
+
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -87,13 +89,14 @@ public  static  String  CHARSET_UTF8="UTF8";
      */
     public  static List<Point> getAllPoint(int a, int b, int fq){
         Point point;
-        List<Point> list=new ArrayList<Point>();
-        for (int i = -fq; i <=fq ; i++) {
-            for (int j = -fq; j <=fq ; j++) {
-                if (i*i==j*j*j+a*j+b) {//点在曲线上
+        List<Point> list=new LinkedList<Point>();
+        for (int i = 0; i <=fq ; i++) {
+            for (int j = 0; j <=fq ; j++) {
+                if (i*i%fq==(j*j*j+a*j+b)%fq) {//点在曲线上  取模运算
                     point=new Point();
                     point.y=i;
                     point.x=j;
+//                    System.out.println(point);
                     list.add(point);
                 }
             }
@@ -152,7 +155,6 @@ public  static  String  CHARSET_UTF8="UTF8";
         }
         return  p1;
     }
-
     /**
      *  *y 2= x 3+ 4x + 20    (fq=127)
      * 根据椭圆特征求基点
@@ -164,60 +166,146 @@ public  static  String  CHARSET_UTF8="UTF8";
      */
     public  static  List<Point> getBasePointList(int a,int b,int fq){
       List<Point> allPoint=EccUtil.getAllPoint(a,b,fq);
-      List<Point> basePoint=new ArrayList<Point>();
+      List<Point> basePoint=new LinkedList<Point>();
         if (allPoint == null) {
             return null;
         }
         Point nextPoint;
+        int max=0;
         for (Point point: allPoint) {
             for (int i = 2; i <=fq ; i++) {
                 nextPoint=EccUtil.kMulPoint(point,i,a);
                 if (nextPoint.x==point.x&&isPrimeNum(i)) {
                     point.n=i;
                     basePoint.add(point);
+//                    System.out.println("basePoint:"+point);
+                    if (i >=max) {
+                        max=i;
+                    }
                     continue;
                 }
             }
         }
+        System.out.println("基数最大的阶是："+max);
         return basePoint;
+    }
+
+    public  static Point getFirstBasePoint(int a,int b,int fq){
+        List<Point> allPoint=EccUtil.getAllPoint(a,b,fq);
+        if (allPoint == null) {
+            return null;
+        }
+        Point nextPoint;
+        int max=0;
+        for (Point point: allPoint) {
+            for (int i = 2; i <=fq ; i++) {
+                nextPoint=EccUtil.kMulPoint(point,i,a);
+                if (nextPoint.x==point.x&&isPrimeNum(i)) {
+                    point.n=i;
+
+                    System.out.println("basePoint:"+point);
+                    if (i >=max) {
+                        max=i;
+                    }
+                    return point;
+                }
+            }
+        }
+        System.out.println("基数最大的阶是："+max);
+        return null;
+    }
+
+    public  static Point  getBasePoint(int a,int b,int fq){
+        List<Point> list= EccUtil.getBasePointList(a, b, fq);
+        Random random=new Random();
+         int index=random.nextInt(list.size());
+        return list.get(index);
+    }
+    /**
+     * 获取基数的阶
+     * @return
+     */
+    public static int getBasePointRank(Point  g,int fq,int a){
+        for (int i = 2; i <fq ; i++) {
+           Point nextPoint=EccUtil.kMulPoint(g,i,a);
+            if (g.x==nextPoint.x&&isPrimeNum(i)) {
+                System.out.println("获取的基阶是:"+i);
+                System.out.println("获取的基点是:"+g);
+                System.out.println("基点相乘点是:"+nextPoint);
+                return  i;
+            }
+        }
+        return  0;
+    }
+
+    /**
+     * 获取接收方公钥
+     * @param gPoint
+     * @param a
+     * @return
+     */
+    public static Point getOpenKey(Point gPoint,int a,int fq){
+        Point q=EccUtil.kMulPoint(gPoint,PRIVATE_KEY,a);// 接收方公布的公钥
+        return  q;
+    }
+
+    /**
+     * 乙方生成公钥
+     * @param gPoint
+     * @param a
+     * @return
+     */
+    public static Point createOpenKey(Point gPoint,int a,int k){
+//        int gRank=getBasePointRank(gPoint, fq, a);
+//        int k=new Random().nextInt(gRank-1);
+        Point q=EccUtil.kMulPoint(gPoint,k,a);// 接收方公布的公钥
+        return  q;
     }
 
     /**
      * 加密方法
+     * 假设用户B 要把信息m 发送给用户A ,则用户B 进行如下操作:
+     * (1) B 找出A 的公钥Q ,然后随机选取一个整数k ,其中0 ≤ k ≤n - 1 ,计算P = kG = ( x1 , y1) ;
+     * (2) 计算: kQ = ( x2 , y2) ;
+     * (3) 计算: c=  mx2;
+     * (4) 最后把( P , c) 发送给接收方A
      * @param openWord
-     * @param gRank
+     * @param openKey
      * @param fq
      * @param a
-     * @param g
+     * @param gPoint
      * @return
      */
-    public  static  Point  enCode(byte[] openWord,int gRank,int fq,int a,Point g){
+    public  static  Point  enCode(byte[] openWord,int k,int fq,int a,Point gPoint,Point openKey){
         Point  p1,p2 , secretWord;
         secretWord=new Point();
+        int[] secretInts=new int[openWord.length];
         byte[] secretBytes=new byte[openWord.length];
-        int k;
-        Point q=EccUtil.kMulPoint(g,PRIVATE_KEY,a);// 接收方公布的公钥
         while (true){
 
-                Random r1 = new Random();
-//            rand.nextInt(MAX - MIN + 1) + MIN
-//            k=(r1.nextInt(gRank-1-1+1)+1) %gRank;
-            k=PRIVATE_KEY;
-            System.out.println("k=:"+k);
-            p1=EccUtil.kMulPoint(g,k,a);                 //   计算p1=kg(x1,y1)      第一点P点    //
+                Random random = new Random();
 
-            p2=EccUtil.kMulPoint(q,k,a);                 // 计算p2=kq=(x2,y2)  第二个点//
+//            random.nextInt(MAX - MIN + 1) + MIN;
+//            k=random.nextInt(gRank-1);
+//            k=PRIVATE_KEY;
+//            System.out.println("k=:"+k);
+            p1=EccUtil.kMulPoint(gPoint,k,a);                 //   计算p1=kg(x1,y1)      第一点P点    //
+
+            p2=EccUtil.kMulPoint(openKey,k,a);                 // 计算p2=kq=(x2,y2)  第二个点//
             if (p2.x!=0) break;
         }
-
-
-        System.out.println("encode K:"+k);
+//        System.out.println("encode K:"+k);
         System.out.println("encode p2.x:"+p2.x);
         for (int i = 0; i <openWord.length ; i++) {
-            secretBytes[i]=int2byte(openWord[i]*p2.x);  //  加密c=字符与x2作乘 强转之后的值 也必须落在byte范围内
+            secretInts[i]=openWord[i]*p2.x;  //  加密c=字符与x2作乘 强转之后的值 也必须落在byte范围内
+            secretBytes[i]= (byte) (openWord[i]*p2.x);
         }
+        BASE64Encoder base64Encoder= new BASE64Encoder();
+        String base64Encode=base64Encoder.encode(openWord);
+//        secretWord.setBase64EncodeStr(*p2.x);;
         secretWord.x=p1.x;
         secretWord.y=p1.y;
+        secretWord.setSecretInts(secretInts);             // 打包(p,c)发送给接受方        //
         secretWord.setBytes(secretBytes);             // 打包(p,c)发送给接受方        //
 
         return secretWord;
@@ -242,44 +330,44 @@ public  static  String  CHARSET_UTF8="UTF8";
 
     /**
      * 解密方法
+     * 当用户A 收到B 发送来的( P , c) 后,用自己的私钥d 进行如下解密操作:
+     * (1) A 计算: dP = ( x2 , y2) , 　因为dP = d ( kG) = dkG = k ( dG) = k ( Q) = ( x2 , y2) ;
+     * (2) 然后计算: m =c x-1  ;从而恢复出信息m
      * @param secretWord
      * @param fq
      * @param a
      * @param g
      * @return
      */
-    public  static  byte[]   deCode(Point  secretWord,int fq,int a,Point g){
+    public  static  byte[]   deCode(Point  secretWord,int a,int d){
          Point p1=new Point();
          Point p2=new Point();
-        byte[] openBytes=new byte[secretWord.getBytes().length];
+        byte[] openBytes=new byte[secretWord.getSecretInts().length];
         char m;
         int i;
         p1.x=secretWord.x;
         p1.y=secretWord.y;
-        p2=EccUtil.kMulPoint (p1,PRIVATE_KEY,a);          //    计算dp=(x2,y2)     //
+        Random random = new Random();
+
+//       int  k=random.nextInt(gRank-1);
+//        System.out.println("k=:"+k);
+
+        p2=EccUtil.kMulPoint (p1,d,a);          //    计算dp=(x2,y2)     //
         System.out.println("decode p2.x:"+p2.x);
 
-        byte[] secretBytes=secretWord.getBytes();
-        for (int j = 0; j <secretBytes.length ; j++) { // 恢复m=c乘x逆 c除以x2             //
+        int[] secretInts=secretWord.getSecretInts();
+        for (int j = 0; j <secretInts.length ; j++) {
+            // 恢复m=c乘x逆 c除以x2             //
 
-            byte  temp=secretBytes[j];
+            int  temp=secretInts[j];
+            openBytes[j]= (byte) (temp/p2.x);
+          /*  for (byte b = Byte.MIN_VALUE; b <=Byte.MAX_VALUE ; b++) {
+                if (temp==p2.x*b) {
+                    openBytes[j]=b;
+                    continue;
+                }
+            }*/
 
-            if (temp>=0) {
-                for (int k = 0; k <=127 ; k++) {
-                    if (temp==p2.x*k%128) {
-                        openBytes[j]=(byte) k;
-                        continue;
-                    }
-                }
-            }else {
-                for (int k = -128; k <0 ; k++) {
-                    if (temp==p2.x*k%129) {
-                        openBytes[j]=(byte) k;
-                        continue;
-                    }
-                }
-            }
-            
         }
 
         return openBytes;
@@ -300,7 +388,7 @@ public  static  String  CHARSET_UTF8="UTF8";
      * @param args
      */
     public static  void  mainSub (String[] args) throws Exception {
-        int a=4;
+     /*   int a=4;
         int fq=127;
         int gRank=3;
         Point g=new Point(3,44);
@@ -327,12 +415,79 @@ public  static  String  CHARSET_UTF8="UTF8";
         Point imgSecret= EccUtil.enCode(imgBytes,gRank, fq, a, g);
         outputStream.write(imgSecret.getBytes());
         inputStream.close();
-        outputStream.close();
+        outputStream.close();*/
         //把
     }
 
+    public  static  Point  enCodeImage(Point source,int k,int fq,int a,Point gPoint,Point openKey){
+        Point  p1,p2 , secretWord;
+        secretWord=new Point();
+        BufferedImage sourceImage=source.getSourceImage();
+        int width=sourceImage.getWidth();
+        int height=sourceImage.getHeight();
+        p1=EccUtil.kMulPoint(gPoint,k,a);                 //   计算p1=kg(x1,y1)      第一点P点    //
+        p2=EccUtil.kMulPoint(openKey,k,a);                 // 计算p2=kq=(x2,y2)  第二个点//
+        System.out.println("encode p2.x:"+p2.x);
+//        BufferedImage encodeImage= new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+        BufferedImage encodeImage= new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        BufferedImage garyImage= new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+        List<LongRgb> longRgbs=new LinkedList<LongRgb>();
+        for(int i= 0 ; i < width ; i++){
+            for(int j = 0 ; j < height; j++){
+                int rgb = sourceImage.getRGB(i, j);
+                garyImage.setRGB(i, j, rgb);  //将像素存入缓冲区
+                encodeImage.setRGB(i, j, rgb*p2.getX());  //将像素存入缓冲区
+                LongRgb longRgb=new LongRgb(i,j,1L*rgb*p2.getX());
+                longRgbs.add(longRgb);
+            }
+        }
+       /* for(int i= 0 ; i < width ; i++){
+            for(int j = 0 ; j < height; j++){
+                int rgb = garyImage.getRGB(i, j);
+                encodeImage.setRGB(i, j, rgb*Math.abs(p2.getX()%fq));  //将像素存入缓冲区
+            }
+        }*/
 
+        secretWord.x=p1.x;
+        secretWord.y=p1.y;
+        secretWord.setEncodeImage(encodeImage);             // 打包(p,c)发送给接受方        //
+        secretWord.setSourceImage(sourceImage);
+        secretWord.setGaryImage(garyImage);
+        secretWord.setLongRgbList(longRgbs);
+        return secretWord;
+    }
 
+    public  static  Point  deCodeImage(Point  secretWord,int a,int d){
+        Point p1=new Point();
+        Point p2=new Point();
+        Point sourcePoint=new Point();
+
+        p1.x=secretWord.x;
+        p1.y=secretWord.y;
+        p2=EccUtil.kMulPoint (p1,d,a);          //    计算dp=(x2,y2)     //
+        System.out.println("decode p2.x:"+p2.x);
+        BufferedImage secretEncodeImage=secretWord.getEncodeImage();
+        int width=secretEncodeImage.getWidth();
+        int height=secretEncodeImage.getHeight();
+        BufferedImage sourceImage=new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+       /* for(int i= 0 ; i < width ; i++){
+            for(int j = 0 ; j < height; j++){
+                int rgb = secretEncodeImage.getRGB(i, j);
+                sourceImage.setRGB(i, j, rgb);  //将像素存入缓冲区
+            }
+        }*/
+        for (LongRgb longRgb:secretWord.getLongRgbList()){
+            int i=longRgb.getI();
+            int j=longRgb.getJ();
+            int rgb= (int) (longRgb.getRgb()/p2.getX());
+            sourceImage.setRGB(i, j, rgb);  //将像素存入缓冲区
+        }
+        sourcePoint.setSourceImage(sourceImage);
+//        sourcePoint.setSourceImage(secretWord.getSourceImage());
+        sourcePoint.setEncodeImage(secretEncodeImage);
+        sourcePoint.setGaryImage(secretWord.getGaryImage());
+        return sourcePoint;
+    }
 
 
 }

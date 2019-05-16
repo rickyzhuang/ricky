@@ -5,7 +5,9 @@
       <module fileurl="file://$PROJECT_DIR$/ricky.iml" filepath="$PROJECT_DIR$/ricky.iml" />
       <module fileurl="file://$PROJECT_DIR$/ricky_admin_web/ricky_admin_web.iml" filepath="$PROJECT_DIR$/ricky_admin_web/ricky_admin_web.iml" />
       <module fileurl="file://$PROJECT_DIR$/ricky_api/ricky_api.iml" filepath="$PROJECT_DIR$/ricky_api/ricky_api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ricky_ecc/ricky_ecc.iml" filepath="$PROJECT_DIR$/ricky_ecc/ricky_ecc.iml" />
       <module fileurl="file://$PROJECT_DIR$/ricky_service/ricky_service.iml" filepath="$PROJECT_DIR$/ricky_service/ricky_service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ricky_springBoot_web/ricky_springBoot_web.iml" filepath="$PROJECT_DIR$/ricky_springBoot_web/ricky_springBoot_web.iml" />
       <module fileurl="file://$PROJECT_DIR$/ricky_web/ricky_web.iml" filepath="$PROJECT_DIR$/ricky_web/ricky_web.iml" />
     </modules>
   </component>

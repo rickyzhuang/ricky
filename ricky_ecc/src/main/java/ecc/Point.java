@@ -1,14 +1,26 @@
 package ecc;
 
+import lombok.Data;
+
+import java.awt.image.BufferedImage;
+import java.util.List;
+
 /**
  * Describetion
  * Created  by  zhuangjiayin
  * Date : 2018/7/12
  */
+@Data
 public class Point {
     int x;
     int y;
     byte[] bytes;
+    int[] secretInts;
+    BufferedImage sourceImage;
+    BufferedImage garyImage;
+    BufferedImage encodeImage;
+    List<LongRgb>  longRgbList;
+
     /**
      * 基点的阶
      */
