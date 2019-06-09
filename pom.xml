@@ -15,6 +15,7 @@
         <module>ricky_admin_web</module>
         <module>ricky_springBoot_web</module>
         <module>ricky_ecc</module>
+        <module>ricky_read_source_code</module>
     </modules>
 
 
