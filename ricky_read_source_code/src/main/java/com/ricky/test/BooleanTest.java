@@ -1,4 +1,4 @@
-package lang;
+package com.ricky.test;
 
 import junit.framework.TestCase;
 

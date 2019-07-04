@@ -170,4 +170,17 @@ public class Test2 extends TestCase {
         fout.close();
     }
 
+    public void testGamb(){
+         int winRatio=95 ;
+         int prizeRatio=5;
+         int loseRatio=5;
+         int loseCost=100;
+         int n=1;
+         while (true){
+//             winRatio*prizeRatio
+         }
+
+    }
+
+
 }
